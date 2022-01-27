@@ -1,6 +1,8 @@
 package config
 
 type Log struct {
-	Name string `json:"name"`
-	Path string `json:"path"`
+	Path   string `json:"path"`
+	Name   string `json:"name"`
+	Format string `json:"format"`
+	Level  string `json:"level"`
 }

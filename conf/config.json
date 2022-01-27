@@ -1,0 +1,12 @@
+{
+  "system": {
+    "env": "develop",
+    "addr": "8080"
+  },
+  "log": {
+    "path": "./log/",
+    "name": "pic-vue.log",
+    "format": "text",
+    "level": "info"
+  }
+}

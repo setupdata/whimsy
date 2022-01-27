@@ -5,7 +5,6 @@ package core
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -30,18 +29,18 @@ func Listen() {
 	go func() {
 		// service connections
 		if err := global.PIC_SERVER.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
+			global.PIC_LOG.Fatal("listen: %s\n", err)
 		}
 	}()
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	log.Println("Shutdown Server ...")
+	global.PIC_LOG.Info("Shutdown Server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := global.PIC_SERVER.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
+		global.PIC_LOG.Fatal("Server Shutdown:", err)
 	}
-	log.Println("Server exiting")
+	global.PIC_LOG.Info("Server exiting")
 }

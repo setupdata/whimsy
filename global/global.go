@@ -25,7 +25,5 @@ var (
 	PIC_SERVER GinServer      // 服务实例
 )
 
-// 日志相关
-var (
-	PIC_LOG_LEVEL logrus.Level // 设置日志等级
-)
+// 默认参数
+var ()

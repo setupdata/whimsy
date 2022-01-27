@@ -14,6 +14,6 @@ func InitRouter() *gin.Engine {
 			"success": "Hello World",
 		})
 	})
-	global.PIC_LOG.Info("路由初始化完成")
+	global.PIC_LOG.Error("路由初始化完成")
 	return r
 }

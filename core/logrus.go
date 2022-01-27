@@ -1,82 +1,69 @@
 package core
 
 import (
-	"github.com/sirupsen/logrus"
-	"os"
+	"fmt"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"picture/global"
+	"time"
 )
 
-func InitLogrus() *logrus.Logger {
-	log := logrus.New()
-	// 日志输出位置
-	log.SetOutput(os.Stdout)
+func InitLogrus() *log.Logger {
+	myLoger := log.New()
 
 	//设置日志级别
-	log.SetLevel(logrus.InfoLevel)
+	switch level := global.PIC_CONFIG.Log.Level; level {
+	case "debug":
+		myLoger.SetLevel(log.DebugLevel)
+	case "info":
+		myLoger.SetLevel(log.InfoLevel)
+	case "warn":
+		myLoger.SetLevel(log.WarnLevel)
+	case "error":
+		myLoger.SetLevel(log.ErrorLevel)
+	default:
+		myLoger.SetLevel(log.InfoLevel)
+	}
 
 	// 设置日志格式
-	log.SetFormatter(&logrus.TextFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-	})
-	//log.SetFormatter(&logrus.JSONFormatter{})
-	return log
+	switch format := global.PIC_CONFIG.Log.Format; format {
+	case "text":
+		myLoger.SetFormatter(&log.TextFormatter{
+			TimestampFormat: "2006-01-02 15:04:05",
+		})
+	case "json":
+		myLoger.SetFormatter(&log.JSONFormatter{
+			TimestampFormat: "2006-01-02 15:04:05",
+		})
+	}
+
+	/* 日志轮转相关函数
+	 *WithLinkName` 为最新的日志建立软连接
+	 *WithRotationTime` 设置日志分割的时间，隔多久分割一次
+	 *WithMaxAge 和 WithRotationCount二者只能设置一个
+	 *WithMaxAge` 设置文件清理前的最长保存时间
+	 *WithRotationCount` 设置文件清理前最多保存的个数
+	 */
+	// 下面配置日志每隔 24小时 轮转一个新文件，保留最近 30天 的日志文件，多余的自动清理掉。
+	logPath := "./log/"
+	logName := "pic-vue"
+	logType := "log"
+	//baseLogPath := path.Join(logPath, logName)
+	baseLogPath := logPath + logName + "." + logType
+	writer, err := rotatelogs.New(
+		logPath+logName+"-%Y%m%d%H%M."+logType,
+		rotatelogs.WithLinkName(baseLogPath),     // 生成软链，指向最新日志文件，软链接Symlink在windows下需要权限
+		rotatelogs.WithMaxAge(time.Minute*5),     // 文件最大保存时间，最小分钟为单位
+		rotatelogs.WithRotationTime(time.Minute), // 日志切割时间间隔，最小为1分钟轮询，默认60s，低于1分钟就按1分钟来
+	)
+
+	if err != nil {
+		panic(fmt.Errorf("配置本地日志服务错误: %v", errors.WithStack(err)))
+	}
+
+	// 日志输出方式
+	myLoger.SetOutput(writer)
+
+	return myLoger
 }
-
-//func newLfsHook(logLevel *string) logrus.Hook {
-//	logName := "pic-log"
-//	// WithLinkName为最新的日志建立软连接,以方便随着找到当前日志文件
-//	// WithRotationTime设置日志分割的时间,这里设置为一小时分割一次
-//	// WithMaxAge和WithRotationCount二者只能设置一个,
-//	// WithMaxAge设置文件清理前的最长保存时间,
-//	// WithRotationCount设置文件清理前最多保存的个数.
-//	writer, err := rotatelogs.New(
-//		logName+".%Y%m%d%H",
-//		rotatelogs.WithLinkName(logName),
-//		rotatelogs.WithRotationTime(time.Hour*24),
-//		rotatelogs.WithMaxAge(time.Hour*24*30),
-//		//maxRemainCnt uint
-//		//rotatelogs.WithRotationCount(maxRemainCnt),
-//	)
-//
-//	if err != nil {
-//		//log.Errorf("config local file system for logger error: %v", err)
-//	}
-//
-//	level, ok := logLevels[*logLevel]
-//
-//	if ok {
-//		log.SetLevel(level)
-//	} else {
-//		log.SetLevel(log.WarnLevel)
-//	}
-//
-//	lfsHook := lfshook.NewHook(lfshook.WriterMap{
-//		log.DebugLevel: writer,
-//		log.InfoLevel:  writer,
-//		log.WarnLevel:  writer,
-//		log.ErrorLevel: writer,
-//		log.FatalLevel: writer,
-//		log.PanicLevel: writer,
-//	}, &log.TextFormatter{DisableColors: true})
-//
-//	return lfsHook
-//}
-
-//func init() {
-//	path := "/Users/opensource/test/go.log"
-//	/* 日志轮转相关函数
-//	`WithLinkName` 为最新的日志建立软连接
-//	`WithRotationTime` 设置日志分割的时间，隔多久分割一次
-//	WithMaxAge 和 WithRotationCount二者只能设置一个
-//	 `WithMaxAge` 设置文件清理前的最长保存时间
-//	 `WithRotationCount` 设置文件清理前最多保存的个数
-//	*/
-//	// 下面配置日志每隔 1 分钟轮转一个新文件，保留最近 3 分钟的日志文件，多余的自动清理掉。
-//	writer, _ := rotatelogs.New(
-//		path+".%Y%m%d%H%M",
-//		rotatelogs.WithLinkName(path),
-//		rotatelogs.WithMaxAge(time.Duration(180)*time.Second),
-//		rotatelogs.WithRotationTime(time.Duration(60)*time.Second),
-//	)
-//	log.SetOutput(writer)
-//	//log.SetFormatter(&log.JSONFormatter{})
-//}

@@ -6,6 +6,7 @@ package core
 import (
 	"github.com/fvbock/endless"
 	"picture/global"
+	"time"
 )
 
 func CreatServer(address string) global.GinServer {
@@ -20,6 +21,6 @@ func Listen() {
 	// 优雅地重启或停止
 	err := global.PIC_SERVER.ListenAndServe()
 	if err != nil {
-		fmt.Printf("server err: %v", err)
+		global.PIC_LOG.Fatal("server err: %v", err)
 	}
 }
