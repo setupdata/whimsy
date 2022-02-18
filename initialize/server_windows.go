@@ -1,7 +1,7 @@
 //go:build windows
 // +build windows
 
-package core
+package initialize
 
 import (
 	"context"
@@ -29,18 +29,19 @@ func Listen() {
 	go func() {
 		// service connections
 		if err := global.PIC_SERVER.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			global.PIC_LOG.Fatal("listen: %s\n", err)
+			// Fatal() 进程退出代码为 1
+			global.PIC_LOG.Fatal("http服务错误: ", err)
 		}
 	}()
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	global.PIC_LOG.Info("Shutdown Server ...")
+	global.PIC_LOG.Info("关闭http服务")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := global.PIC_SERVER.Shutdown(ctx); err != nil {
-		global.PIC_LOG.Fatal("Server Shutdown:", err)
+		global.PIC_LOG.Fatal("http服务关闭因为:", err)
 	}
-	global.PIC_LOG.Info("Server exiting")
+	global.PIC_LOG.Info("http服务结束")
 }

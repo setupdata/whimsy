@@ -1,12 +1,27 @@
 {
   "system": {
     "env": "develop",
-    "addr": "8080"
+    "Ip": "0.0.0.0",
+    "addr": "8080",
+    "dbType": "mysql",
+    "ginMod": "release"
   },
   "log": {
     "path": "./log/",
-    "name": "pic-vue.log",
+    "name": "pic-vue",
+    "type": "log",
     "format": "text",
-    "level": "info"
+    "level": "info",
+    "maxAge": 43200,
+    "rotationTime": 1440
+  },
+  "mysql": {
+    "Username": "root",
+    "Password": "Abc@123321",
+    "Path": "127.0.0.1",
+    "Port": "3306",
+    "Dbname": "picture",
+    "Config": "charset=utf8mb4&parseTime=True&loc=Local",
+    "LogMode": "info"
   }
 }

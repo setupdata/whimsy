@@ -1,7 +1,7 @@
 //go:build !windows
 // +build !windows
 
-package core
+package initialize
 
 import (
 	"github.com/fvbock/endless"
@@ -21,6 +21,6 @@ func Listen() {
 	// 优雅地重启或停止
 	err := global.PIC_SERVER.ListenAndServe()
 	if err != nil {
-		global.PIC_LOG.Fatal("server err: %v", err)
+		global.PIC_LOG.Fatal("http服务错误: %v", err)
 	}
 }
