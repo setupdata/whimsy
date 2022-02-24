@@ -6,8 +6,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
-	"picture/config"
 	"time"
+	"whimsy/config"
 )
 
 // GinServer

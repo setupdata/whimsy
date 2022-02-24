@@ -2,7 +2,7 @@ package core
 
 import (
 	"github.com/gin-gonic/gin"
-	"picture/global"
+	"whimsy/global"
 )
 
 func InitRouter() *gin.Engine {

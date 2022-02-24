@@ -1,8 +1,8 @@
 package main
 
 import (
-	"picture/core"
-	"picture/global"
+	"whimsy/core"
+	"whimsy/global"
 )
 
 func init() {
@@ -12,9 +12,6 @@ func init() {
 	global.PIC_LOG = core.InitLogrus()
 	// 初始化数据库 gorm
 	global.PIC_DB = core.InitGorm()
-	//if global.PIC_DB == nil {
-	//	panic(fmt.Errorf("数据库错误"))
-	//}
 	// 初始化路由
 	global.PIC_ROUTER = core.InitRouter()
 }
@@ -22,13 +19,6 @@ func init() {
 func main() {
 	//启动服务
 	core.InitServer()
-	defer closeServer()
-}
-
-func closeServer() {
-	if global.PIC_DB != nil {
-		// 程序结束前关闭数据库链接
-		db, _ := global.PIC_DB.DB()
-		_ = db.Close()
-	}
+	// 关闭前处理
+	defer core.CloseServer()
 }

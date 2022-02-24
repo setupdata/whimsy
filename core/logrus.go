@@ -1,48 +1,47 @@
 package core
 
 import (
+	"bytes"
 	"fmt"
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	rotateLogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-	"picture/global"
+	"github.com/sirupsen/logrus"
+	"path/filepath"
 	"time"
+	"whimsy/global"
 )
 
-func InitLogrus() *log.Logger {
-	myLoger := log.New()
+// MyFormatter 自定义输出格式
+type MyFormatter struct{}
 
-	//设置日志级别
-	if global.PIC_CONFIG.System.Env == "develop" {
-		// 开发环境
-		myLoger.SetLevel(log.DebugLevel)
+func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	//global.PIC_LOG.Debug(entry, "\n")
+	var b *bytes.Buffer
+	if entry.Buffer != nil {
+		b = entry.Buffer
 	} else {
-		switch level := global.PIC_CONFIG.Log.Level; level {
-		case "debug":
-			myLoger.SetLevel(log.DebugLevel)
-		case "info":
-			myLoger.SetLevel(log.InfoLevel)
-		case "warn":
-			myLoger.SetLevel(log.WarnLevel)
-		case "error":
-			myLoger.SetLevel(log.ErrorLevel)
-		default:
-			myLoger.SetLevel(log.InfoLevel)
-		}
+		b = &bytes.Buffer{}
+		return b.Bytes(), fmt.Errorf("输入为空")
+	}
+	// 时间格式
+	timestamp := entry.Time.Format("2006-01-02 15:04:05")
+
+	var newLog string
+	//HasCaller()为true才会有调用信息
+	if entry.HasCaller() {
+		fName := filepath.Base(entry.Caller.File)
+		newLog = fmt.Sprintf("[%s] [%s] %s [%s:%d %s] \n",
+			timestamp, entry.Level, entry.Message, fName, entry.Caller.Line, entry.Caller.Function)
+	} else {
+		newLog = fmt.Sprintf("[%s] [%s] %s\n", timestamp, entry.Level, entry.Message)
 	}
 
-	// 设置日志格式
-	switch format := global.PIC_CONFIG.Log.Format; format {
-	case "text":
-		myLoger.SetFormatter(&log.TextFormatter{
-			TimestampFormat: "2006-01-02 15:04:05",
-		})
-	case "json":
-		myLoger.SetFormatter(&log.JSONFormatter{
-			TimestampFormat: "2006-01-02 15:04:05",
-		})
-	}
+	b.WriteString(newLog)
+	return b.Bytes(), nil
+}
 
+// 日志文件分割
+func creatWriter() *rotateLogs.RotateLogs {
 	/* 日志轮转相关函数
 	 *WithLinkName` 为最新的日志建立软连接
 	 *WithRotationTime` 设置日志分割的时间，隔多久分割一次
@@ -55,19 +54,72 @@ func InitLogrus() *log.Logger {
 	logName := global.PIC_CONFIG.Log.Name
 	logType := global.PIC_CONFIG.Log.Type
 	baseLogPath := logPath + logName + "." + logType
-	writer, err := rotatelogs.New(
+	writer, err := rotateLogs.New(
 		logPath+logName+"-%Y%m%d%H%M."+logType,
-		rotatelogs.WithLinkName(baseLogPath),                                                       // 生成软链，指向最新日志文件，软链接Symlink在windows下需要权限
-		rotatelogs.WithMaxAge(time.Minute*time.Duration(global.PIC_CONFIG.Log.MaxAge)),             // 文件最大保存时间，最小分钟为单位
-		rotatelogs.WithRotationTime(time.Minute*time.Duration(global.PIC_CONFIG.Log.RotationTime)), // 日志切割时间间隔，最小为1分钟轮询，默认60s，低于1分钟就按1分钟来
+		rotateLogs.WithLinkName(baseLogPath),                                                       // 生成软链，指向最新日志文件，软链接Symlink在windows下需要权限
+		rotateLogs.WithMaxAge(time.Minute*time.Duration(global.PIC_CONFIG.Log.MaxAge)),             // 文件最大保存时间，最小分钟为单位
+		rotateLogs.WithRotationTime(time.Minute*time.Duration(global.PIC_CONFIG.Log.RotationTime)), // 日志切割时间间隔，最小为1分钟轮询，默认1分钟，低于1分钟就按1分钟来
 	)
 
 	if err != nil {
 		panic(fmt.Errorf("配置本地日志服务错误: %v", errors.WithStack(err)))
 	}
 
-	// 日志输出方式
-	myLoger.SetOutput(writer)
+	return writer
+}
 
-	return myLoger
+func InitLogrus() *logrus.Logger {
+	myLogger := logrus.New()
+
+	//设置日志级别
+	level := global.PIC_CONFIG.Log.Level
+	if global.PIC_CONFIG.System.Env == "develop" {
+		// 开发环境
+		level = "Debug"
+	}
+	switch level {
+	case "Debug":
+		myLogger.SetLevel(logrus.DebugLevel)
+	case "Info":
+		myLogger.SetLevel(logrus.InfoLevel)
+	case "Warn":
+		myLogger.SetLevel(logrus.WarnLevel)
+	case "Error":
+		myLogger.SetLevel(logrus.ErrorLevel)
+	case "Fatal":
+		myLogger.SetLevel(logrus.FatalLevel)
+	case "Panic":
+		myLogger.SetLevel(logrus.PanicLevel)
+	default:
+		myLogger.SetLevel(logrus.InfoLevel)
+	}
+
+	if level != "Info" {
+		// 等级不为Info时，输出文件名、行号及函数名
+		myLogger.SetReportCaller(true)
+	}
+
+	// 设置日志格式
+	switch format := global.PIC_CONFIG.Log.Format; format {
+	case "text":
+		myLogger.SetFormatter(&logrus.TextFormatter{
+			ForceQuote:      true, // 输出加双引号
+			TimestampFormat: "2006-01-02 15:04:05",
+		})
+	case "json":
+		myLogger.SetFormatter(&logrus.JSONFormatter{
+			TimestampFormat: "2006-01-02 15:04:05",
+		})
+	case "piclog":
+		myLogger.SetFormatter(&MyFormatter{})
+	default:
+		myLogger.SetFormatter(&MyFormatter{})
+	}
+
+	// 日志输出方式
+	myLogger.SetOutput(creatWriter())
+
+	// 日志
+	myLogger.Info("logrus初始化完成")
+	return myLogger
 }

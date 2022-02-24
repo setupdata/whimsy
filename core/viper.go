@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
-	"picture/global"
+	"whimsy/global"
 )
 
 func InitViper() *viper.Viper {
 	fmt.Println("初始化 viper")
 
 	var config string
-	// 尝试读取命令行参数 默认为config-default.json
-	flag.StringVar(&config, "config", "config.json", "choose config file name.")
+	flag.StringVar(&config, "config", "config.yaml", "choose config file name.")
 	flag.Parse()
 
 	// 判空
@@ -27,7 +26,7 @@ func InitViper() *viper.Viper {
 	// 指定配置文件名称
 	v.SetConfigName(config)
 	// 指定文件类型
-	v.SetConfigType("json")
+	v.SetConfigType("yaml")
 	//配置搜索路径
 	v.AddConfigPath("./")
 	v.AddConfigPath("./conf/")

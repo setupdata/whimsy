@@ -5,11 +5,12 @@ package initialize
 
 import (
 	"github.com/fvbock/endless"
-	"picture/global"
 	"time"
+	"whimsy/global"
 )
 
 func CreatServer(address string) global.GinServer {
+	global.PIC_LOG.Debug("创建http服务")
 	s := endless.NewServer(address, global.PIC_ROUTER)
 	s.ReadHeaderTimeout = 20 * time.Second
 	s.WriteTimeout = 20 * time.Second
@@ -23,4 +24,5 @@ func Listen() {
 	if err != nil {
 		global.PIC_LOG.Fatal("http服务错误: %v", err)
 	}
+	global.PIC_LOG.Info("http服务结束")
 }

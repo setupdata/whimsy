@@ -1,4 +1,4 @@
-module picture
+module whimsy
 
 go 1.17
 

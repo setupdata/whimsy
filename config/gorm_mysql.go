@@ -1,13 +1,16 @@
 package config
 
 type Mysql struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Path     string `json:"path"`
-	Port     string `json:"port"`
-	Dbname   string `json:"dbname"`
-	Config   string `json:"config"`
-	LogMode  string `json:"logMode"`
+	Username     string `json:"username" yaml:"username"`
+	Password     string `json:"password" yaml:"password"`
+	Path         string `json:"path" yaml:"path"`
+	Port         string `json:"port" yaml:"port"`
+	Dbname       string `json:"dbname" yaml:"dbname"`
+	Config       string `json:"config" yaml:"config"`
+	MaxIdleConns int    `json:"maxIdleConns" yaml:"maxIdleConns"`
+	MaxOpenConns int    `json:"maxOpenConns" yaml:"maxOpenConns"`
+	LogMode      string `json:"logMode" yaml:"logMode"`
+	LogLogrus    bool   `json:"logLogrus" yaml:"logLogrus"`
 }
 
 // Dsn 拼接mysql dsn 链接

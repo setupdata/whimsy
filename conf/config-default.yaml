@@ -1,0 +1,31 @@
+# 系统配置文件
+system:
+  env: 'develop'    # 环境值 线上环境：public, 日志等级由log.levels设置; 开发环境：develop, 日志等级为debug模式;
+  ip: '0.0.0.0'     # 监听ip
+  addr: '8080'      # 端口号
+  dbType: 'mysql'   # 数据库类型
+  ginMod: 'release' # gin模式 debug,release,test 默认为release
+  isFirstIn: true   # 是否第一次运行程序
+
+# 日志
+log:
+  path: './log/'      # 日志路径
+  name: 'pic-vue'     # 日志文件名
+  type: 'log'         # 日志文件后缀
+  format: 'piclog'      # 日志格式 text,json,piclog, piclog为项目自定格式
+  level: 'Info'       # 日志等级 Panic,Fatal,Error,Warn,Info,Debug  会被环境值develop覆盖
+  maxAge: 43200       # 文件最大保存时间，单位为分钟 43200为30天
+  rotationTime: 1440  # 日志切割时间间隔，单位为分钟 1400为一天
+
+# 数据库使用logrus进行输出，日志等级为Debug
+mysql:
+  Username: 'root'        # 用户名
+  Password: 'Abc@123321'  # 密码
+  Path: '127.0.0.1'       # 路径
+  Port: '3306'            # 端口号
+  Dbname: 'picture'       # 数据库名称
+  Config: 'charset=utf8mb4&parseTime=True&loc=Local' # 数据库连接配置 详情见 https://gorm.cn
+  maxIdleConns: 10        # 空闲中的最大连接数
+  maxOpenConns: 100       # 打开到数据库的最大连接数
+  logMode: "Warn"         # Gorm日志级别Silent,Error,Warn,Info; Silent 为不输出
+  logLogrus: true        # 是否通过logrus写入日志文件, 同时控制日志颜色; false为控制台输出, 有颜色; true为logrus输出, 无颜色
