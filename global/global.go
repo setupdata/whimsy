@@ -32,14 +32,14 @@ type BaseModel struct {
 // 组件实例
 var (
 	// PIC_CONFIG PIC_DB *gorm.DB
-	PIC_CONFIG              config.Server  // 配置文件
-	PIC_LOG                 *logrus.Logger // logrus日志实例
-	PIC_VIPER               *viper.Viper   // viper实例
-	PIC_DB                  *gorm.DB       // 数据库实例
-	PIC_REDIS               *redis.Client  // redis实例
-	PIC_GIN                 *gin.Engine    // 路由实例
-	PIC_SERVER              GinServer      // 服务实例
-	PIC_Concurrency_Control = &singleflight.Group{}
+	PIC_CONFIG              config.Server           // 配置文件
+	PIC_LOG                 *logrus.Logger          // logrus日志实例
+	PIC_VIPER               *viper.Viper            // viper实例
+	PIC_DB                  *gorm.DB                // 数据库实例
+	PIC_REDIS               *redis.Client           // redis实例
+	PIC_GIN                 *gin.Engine             // Gin实例
+	PIC_SERVER              GinServer               // 服务实例
+	PIC_Concurrency_Control = &singleflight.Group{} // 并发控制 jwt以旧换新
 )
 
 // 默认参数

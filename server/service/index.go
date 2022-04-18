@@ -1,9 +1,8 @@
 package service
 
-import "whimsy/server/service/user"
-
 type ServiceGroup struct {
-	UserService user.UserService
+	UserService
+	PublicService
 }
 
 var ServiceGroupApp = new(ServiceGroup)

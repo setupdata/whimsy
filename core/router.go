@@ -34,7 +34,8 @@ func InitGin() *gin.Engine {
 	PublicGroup := r.Group("")
 	global.PIC_LOG.Debug("创建路由分组：PublicGroup")
 	{ // 公有路由分组，无需验证
-		sysRouter.UserRouter.InitPublicUserRouter(PublicGroup) // 注册共有用户路由
+		sysRouter.VCodeRouter.InitPublicVCodeRouter(PublicGroup) // 注册验证码路由
+		sysRouter.UserRouter.InitPublicUserRouter(PublicGroup)   // 注册共有用户路由
 	}
 	// 创建私有路由分组
 	PrivateGroup := r.Group("")

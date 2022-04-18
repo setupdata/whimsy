@@ -105,6 +105,7 @@ func InitGormMysql() *gorm.DB {
 	}
 }
 
+// 迁移数据库
 func InitTales(sqlDB *gorm.DB) {
 	global.PIC_LOG.Debug("迁移数据库表")
 	err := sqlDB.AutoMigrate(

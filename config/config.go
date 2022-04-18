@@ -6,4 +6,5 @@ type Server struct {
 	Mysql  Mysql  `json:"mysql" yaml:"mysql"`
 	Redis  Redis  `json:"redis" yaml:"redis"`
 	JWT    JWT    `json:"jwt" yaml:"jwt"`
+	EMAIL  EMAIL  `json:"email" yaml:"email"`
 }

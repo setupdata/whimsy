@@ -1,16 +1,17 @@
 package v1
 
 import (
-	"whimsy/server/api/v1/user"
 	"whimsy/server/service"
 )
 
 type ApiGroup struct {
-	UserApi user.Api
+	UserApi  UserApi
+	VCodeApi VCodeApi
 }
 
 var ApiGroupApp = new(ApiGroup)
 
 var (
-	userService = service.ServiceGroupApp.UserService
+	userService   = service.ServiceGroupApp.UserService
+	publicService = service.ServiceGroupApp.PublicService
 )

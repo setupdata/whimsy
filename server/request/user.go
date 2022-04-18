@@ -1,4 +1,4 @@
-package user
+package request
 
 type UserReq struct {
 	Login
