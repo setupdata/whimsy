@@ -12,8 +12,10 @@ func init() {
 	global.PIC_LOG = core.InitLogrus()
 	// 初始化数据库 gorm
 	global.PIC_DB = core.InitGorm()
-	// 初始化路由
-	global.PIC_ROUTER = core.InitRouter()
+	// 初始化 redis
+	global.PIC_REDIS = core.InitRedis()
+	// 初始化Gin框架
+	global.PIC_GIN = core.InitGin()
 }
 
 func main() {

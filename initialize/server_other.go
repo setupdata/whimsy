@@ -11,7 +11,7 @@ import (
 
 func CreatServer(address string) global.GinServer {
 	global.PIC_LOG.Debug("创建http服务")
-	s := endless.NewServer(address, global.PIC_ROUTER)
+	s := endless.NewServer(address, global.PIC_GIN)
 	s.ReadHeaderTimeout = 20 * time.Second
 	s.WriteTimeout = 20 * time.Second
 	s.MaxHeaderBytes = 1 << 20
